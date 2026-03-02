@@ -1,0 +1,37 @@
+<div class="editor-container">
+  <div class="toolbar">
+    <button (click)="newMap(8)">Nuevo (8x8)</button>
+    <button (click)="newMap(16)">Nuevo (16x16)</button>
+    <input 
+      type="number" 
+      min="1" 
+      max="50" 
+      #sizeInput
+      [value]="currentMap.size"
+      (change)="newMap(sizeInput.value)"
+      placeholder="Tamaño"
+    />
+    <button (click)="undo()" [disabled]="!canUndo()">↶ Deshacer</button>
+    <button (click)="redo()" [disabled]="!canRedo()">↷ Rehacer</button>
+    <button (click)="downloadMap()">Descargar JSON</button>
+  </div>
+
+  <div class="canvas-container">
+    <canvas
+      #editorCanvas
+      [width]="currentMap.size * cellSize"
+      [height]="currentMap.size * cellSize"
+      (click)="onCanvasClick($event)"
+      (mousedown)="onCanvasMouseDown($event)"
+      (mousemove)="onCanvasMouseMove($event)"
+      (mouseup)="onCanvasMouseUp()"
+      (mouseleave)="onCanvasMouseUp()"
+    ></canvas>
+  </div>
+
+  <div class="info">
+    <p>Size: {{ currentMap.size }}x{{ currentMap.size }}</p>
+    <p>Start: ({{ currentMap.start.x }}, {{ currentMap.start.y }})</p>
+    <p>Goal: ({{ currentMap.goal.x }}, {{ currentMap.goal.y }})</p>
+  </div>
+</div>

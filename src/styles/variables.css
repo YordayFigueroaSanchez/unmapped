@@ -1,0 +1,50 @@
+/* CSS Variables — Unmapped Project */
+
+:root {
+  /* Colores principales */
+  --color-primary: #1f7a2b;      /* Verde (inicio/éxito) */
+  --color-secondary: #a63b3b;    /* Rojo (meta/peligro) */
+  --color-accent: #2d5f8d;       /* Azul (acentos) */
+
+  /* Escala de grises */
+  --color-bg-dark: #0f1720;      /* Fondo oscuro */
+  --color-bg-light: #1a2332;     /* Fondo secundario */
+  --color-text-primary: #e6eef8; /* Texto principal */
+  --color-text-secondary: #9fb0c6; /* Texto secundario */
+  --color-border: #243240;       /* Bordes */
+
+  /* Canvas y grid */
+  --cell-size: 22px;
+  --cell-gap: 1px;
+  --wall-color: #18424f;
+  --empty-color: #0b2a35;
+  --visited-color: #1a3a45;
+
+  /* Espaciado */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 24px;
+
+  /* Transiciones */
+  --transition-fast: 150ms ease-out;
+  --transition-normal: 300ms ease-out;
+  --transition-slow: 500ms ease-out;
+}
+
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  background-color: var(--color-bg-dark);
+  color: var(--color-text-primary);
+  font-family: system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
