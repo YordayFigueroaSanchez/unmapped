@@ -1,20 +1,148 @@
+# openspec/config.yaml
+# Configuración de OpenSpec para el proyecto Unmapped
+# Spec-Driven Development para asistentes de IA (Claude Code, Cursor, Windsurf)
+# Referencia: https://github.com/Fission-AI/OpenSpec
+
 schema: spec-driven
+venv_manager: uv
 
-# Project context (optional)
-# This is shown to AI when creating artifacts.
-# Add your tech stack, conventions, style guides, domain knowledge, etc.
-# Example:
-#   context: |
-#     Tech stack: TypeScript, React, Node.js
-#     We use conventional commits
-#     Domain: e-commerce platform
+context: |
+  ## Proyecto: Unmapped
+  Juego de laberinto web con visibilidad dinámica: los muros son invisibles
+  hasta que el jugador choca con ellos o se mueve a celdas adyacentes.
+  Los mapas son prediseñados mediante un editor visual integrado en la app.
 
-# Per-artifact rules (optional)
-# Add custom rules for specific artifacts.
-# Example:
-#   rules:
-#     proposal:
-#       - Keep proposals under 500 words
-#       - Always include a "Non-goals" section
-#     tasks:
-#       - Break tasks into chunks of max 2 hours
+  ## Stack tecnológico
+  - Framework: Angular 17+ (Standalone Components)
+  - Lenguaje: TypeScript 5+
+  - Reactividad: Angular Signals (signal, computed, effect)
+  - Renderizado del tablero: HTML Canvas API
+  - Estilos: CSS puro con variables (sin frameworks de UI)
+  - Persistencia: localStorage via MapRepositoryService
+  - Tests: Jest + Angular Testing Library
+  - Build: Angular CLI (ng build)
+  - Deploy objetivo: Vercel / GitHub Pages (PWA opcional via @angular/pwa)
+
+  ## Origen de los mapas
+  Los laberintos NO se generan aleatoriamente en tiempo de ejecución.
+  Todos los mapas son creados manualmente por el diseñador usando el editor
+  visual integrado, guardados en localStorage, y cargados por el jugador
+  desde la pantalla de selección de niveles.
+
+  ## Arquitectura de archivos principales
+  - maze-editor.component.ts  → Editor visual: click en aristas para toggle de muros, define inicio y meta
+  - map-repository.service.ts → CRUD de mapas en localStorage, expone Signal<MazeMap[]>
+  - game.service.ts           → Estado del juego: posición, timer, celdas visitadas, muros descubiertos
+  - maze-board.component.ts   → UI de juego: Canvas + controles teclado/swipe/dpad
+
+  ## Modelos de datos clave
+  - Cell: { x: number, y: number }
+  - Wall: clave string "x1,y1-x2,y2" (menor coordenada primero)
+  - MazeData: { size, walls: Set<string>, start: Cell, goal: Cell }
+  - MazeMap: MazeData + { id, name, difficulty, walls: string[], createdAt }
+  - GameState: { maze, player, visitedCells, discoveredWalls, elapsedMs, status, moves, collisions }
+  - GameStatus: 'idle' | 'playing' | 'won'
+
+  ## Convenciones del proyecto
+  - Signals para todo el estado reactivo, no BehaviorSubject ni NgRx
+  - Standalone components (sin NgModules)
+  - Canvas para render del tablero; sin librerías de gráficos externas
+  - Muros representados como Set<string> para O(1) en consultas
+  - Coordenadas: x = columna (horizontal), y = fila (vertical)
+  - El borde del tablero NO tiene muros implícitos; se agregan explícitamente en el editor
+  - Nomenclatura: camelCase para variables, PascalCase para clases e interfaces
+  - Idioma del código: inglés (variables, funciones, clases, comentarios inline y nombres de archivos)
+  - Idioma de la documentación: español (README.md, CHANGELOG.md, JSDoc, ADRs, glosario y config.yaml)
+  - No existe generación aleatoria de laberintos; cualquier propuesta que la incluya debe rechazarse
+
+  ## Patrones de testing
+  - Tests unitarios para MazeEditorComponent: toggle de muros, validación de mapa (inicio ≠ meta)
+  - Tests de integración para GameService: flujo completo carga de mapa → movimiento → victoria
+  - Tests de componente para MazeBoardComponent: render correcto del canvas
+  - Usar Given/When/Then en specs de comportamiento
+
+rules:
+  proposal:
+    - Describir el impacto en el estado del juego (GameState) si aplica
+    - Identificar si el cambio afecta la lógica del editor, del juego, o ambos
+    - Incluir consideraciones de UX para jugadores en mobile (touch) y desktop (teclado)
+    - Indicar si se requieren cambios en MapRepositoryService o en el esquema de MazeMap
+
+  specs:
+    - Usar formato Given/When/Then para todos los escenarios
+    - Cada escenario debe ser verificable con un test automatizado
+    - Separar specs de comportamiento del jugador de specs del editor de mapas
+    - No incluir detalles de implementación en los escenarios
+    - Referenciar los modelos de datos existentes por nombre exacto
+
+  design:
+    - Indicar qué archivos existentes se modifican y cuáles se crean nuevos
+    - Incluir diagrama de flujo de datos si el cambio afecta más de dos servicios
+    - Documentar efectos secundarios sobre Signals reactivos
+    - Especificar la estrategia de render en Canvas si el cambio afecta la UI del tablero
+
+  tasks:
+    - Ordenar tareas de menor a mayor dependencia (primero modelos, luego servicios, luego UI)
+    - Incluir tarea explícita de tests para cada unidad modificada
+    - Marcar con [BREAKING] cualquier cambio que altere la estructura de MazeMap en localStorage
+    - Incluir tarea de validación manual en mobile si se modifica el Canvas o los controles
+    - Nunca incluir tareas relacionadas con generación aleatoria de laberintos
+
+experts:
+  - id: web-design
+    name: Diseñador de Aplicaciones Web
+    description: |
+      Experto en diseño de interfaces web para aplicaciones interactivas y juegos.
+      Especializado en UX/UI para experiencias de usuario en contextos de juego,
+      con foco en legibilidad, jerarquía visual, retroalimentación al jugador y
+      accesibilidad en dispositivos móviles y desktop.
+    responsibilities:
+      - Definir la paleta de colores, tipografía y sistema de tokens de diseño del proyecto
+      - Revisar y aprobar cualquier propuesta que modifique la UI del tablero o del editor
+      - Garantizar consistencia visual entre MazeBoardComponent y MazeEditorComponent
+      - Asegurar que los estados del juego (idle, playing, won) tengan feedback visual claro
+      - Validar que los controles táctiles sean intuitivos y las zonas de toque suficientemente grandes
+      - Proponer animaciones y microinteracciones que refuercen la mecánica de descubrimiento de muros
+    principles:
+      - Minimalismo funcional: cada elemento visual cumple un rol en la jugabilidad
+      - Contraste alto entre celdas visitadas, no visitadas, muros y el jugador
+      - El jugador nunca debe dudar visualmente dónde está ni cuál es la meta
+      - Las restricciones del Canvas no son limitaciones sino oportunidades de diseño
+      - Mobile-first: si no funciona en 375px de ancho, no está terminado
+    stack_design:
+      - CSS custom properties para todos los tokens (colores, tamaños, tiempos de animación)
+      - Sin dependencias de frameworks de UI (Material, Bootstrap, etc.)
+      - Fuentes: monospace para HUD y datos del juego; sin Google Fonts externas
+      - Tema oscuro como base; alto contraste para elementos interactivos
+    consult_when:
+      - Se propone un nuevo componente visual o pantalla
+      - Se modifica la paleta de colores o el sistema de tokens
+      - Se agregan animaciones o transiciones al Canvas
+      - Se diseña la pantalla de selección de mapas o resultados finales
+      - Se evalúa la experiencia en dispositivos con pantallas pequeñas
+
+  - id: documentation
+    name: Experto en Documentación
+    description: |
+      Responsable de mantener la documentación del proyecto actualizada y coherente
+      con cada cambio que se realice. Garantiza que cualquier desarrollador nuevo
+      pueda entender el proyecto leyendo la documentación sin necesidad de explorar
+      el código fuente.
+    responsibilities:
+      - Mantener actualizado el README.md con instrucciones de instalación, uso y estructura del proyecto
+      - Documentar cada archivo TypeScript con JSDoc en clases, métodos e interfaces públicas
+      - Registrar todos los cambios relevantes en CHANGELOG.md siguiendo el estándar Keep a Changelog
+      - Documentar decisiones de arquitectura en un archivo docs/decisions.md (Architecture Decision Records)
+      - Actualizar config.yaml cuando se agreguen nuevos archivos, expertos o convenciones
+      - Mantener un glosario en docs/glossary.md con los términos clave del dominio del juego
+    standards:
+      - CHANGELOG.md sigue el formato Keep a Changelog (keepachangelog.com) con secciones Added, Changed, Fixed, Removed
+      - JSDoc obligatorio en toda interfaz, clase y método público; opcional en métodos privados simples
+      - Los Architecture Decision Records usan el formato: Título, Estado, Contexto, Decisión, Consecuencias
+      - El README.md siempre incluye: descripción del proyecto, requisitos, instalación, estructura de carpetas y cómo ejecutar
+    consult_when:
+      - Se agrega o elimina un archivo principal del proyecto
+      - Se modifica un modelo de datos (Cell, MazeMap, GameState, etc.)
+      - Se toma una decisión de arquitectura que descarta una alternativa válida
+      - Se cambia una convención de código o de diseño
+      - Se lanza una nueva versión del proyecto
