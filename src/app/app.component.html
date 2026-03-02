@@ -1,8 +1,13 @@
-<header>
-  <h1>{{ title }}</h1>
-</header>
+<nav class="navbar">
+  <div class="nav-container">
+    <h1 class="nav-title">{{ title }}</h1>
+    <ul class="nav-links">
+      <li><a routerLink="/editor" routerLinkActive="active">Editor</a></li>
+    </ul>
+  </div>
+</nav>
 
-<main>
+<main class="router-outlet-container">
   <router-outlet></router-outlet>
 </main>
 

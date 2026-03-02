@@ -260,3 +260,4 @@ export class MazeEditorComponent implements OnInit, AfterViewInit {
   canRedo(): boolean {
     return this.historyIndex < this.history.length - 1;
   }
+}

@@ -49,6 +49,32 @@ npm test
 ng e2e
 ```
 
+## Rutas y navegación
+
+La aplicación usa el enrutador de Angular con componentes standalone. La
+configuración de rutas vive en `src/app/app.routes.ts` y se importa mediante
+`provideRouter(routes)` en `app.config.ts`.
+
+La ruta predeterminada redirige a `/editor` y el navbar del `AppComponent`
+incluye un enlace:
+
+```html
+<a routerLink="/editor" routerLinkActive="active">Editor</a>
+```
+
+> **Cómo añadir una nueva ruta**
+>
+> 1. Importa el nuevo componente en `app.routes.ts`.
+> 2. Añade una entrada `{ path: 'mi-ruta', component: MiComponente }` al
+>    arreglo `routes`.
+> 3. Si la navegas desde la UI, importa `RouterLink`/`RouterLinkActive` en
+>    `AppComponent` y agrega el enlace correspondiente.
+>
+> 4. Actualiza pruebas si es necesario.
+>
+> *Nota:* el antiguo `app-routing.ts` ya no se utiliza; ahora se llama
+> `app.routes.ts` para seguir la convención del proyecto.
+
 ## Estructura del Proyecto
 
 ```
@@ -58,7 +84,7 @@ src/
 │   ├── game/                 # Componente principal del juego
 │   ├── services/             # Servicios (repository, game logic, etc.)
 │   ├── app.component.ts      # Componente raíz
-│   └── app-routing.ts        # Configuración de rutas
+│   └── app.routes.ts         # Configuración de rutas
 ├── styles/
 │   ├── variables.css         # Variables CSS globales
 │   └── global.css            # Estilos globales
